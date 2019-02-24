@@ -1,0 +1,149 @@
+#!/usr/bin/env bash
+toDir="$1"
+toName="$(basename ${toDir})"
+fromDir="$(pwd)"
+fromName="$(basename ${fromDir})"
+# domain under my control - replace with your own domain if you wish
+nsDomain="$(grep -oP '^NS_DOMAIN=\K(.+)$' ${fromDir}/.env)"
+gitUser="$( git config user.name )"
+if [ -z ${gitUser} ] ; then
+  echo '[ERROR] - no git user name '
+  echo ' - to continue first set your git user name ... ' 
+  echo 'https://help.github.com/en/articles/setting-your-username-in-git'
+  echo ' - exiting ... '
+  exit 1
+fi
+if [ ! -d $toDir ] ; then
+  echo " - create dir $toDir"
+  mkdir $toDir 
+fi
+echo "FROM ${fromName}"
+echo "TO ${toName}"
+mkdir -pv $toDir/{bin,inc,content,unit-tests,tmp}
+echo ' - copy bin files'
+cp -vn ${fromDir}/bin/* $toDir/bin
+echo ' - copy Makefile and make includes'
+sed "s/${fromName}/${toName}/g" ${fromDir}/Makefile > $toDir/Makefile
+cp -vn ${fromDir}/inc/* $toDir/inc/
+echo ' - copy travis file'
+cp -vn ${fromDir}/.travis.yml $toDir/
+echo ' - copy .env file and replace vars'
+echo ' - gitignore'
+cp -vn ${fromDir}/.gitignore $toDir/
+echo ' - copy .env file and replace vars'
+# TODO check if port is in use
+f1="$(grep -oP '^NAME(.+)$' ${fromDir}/.env )"
+r1="NAME=${toName}"
+f2="$(grep -oP '^VERSION(.+)$' ${fromDir}/.env )"
+r2='VERSION=v0.0.1'
+f3="$(grep -oP '^TITLE(.+)$' ${fromDir}/.env)"
+r3="TITLE='${toName} xQuery library'"
+f4="$(grep -oP '^CONTAINER(.+)$' ${fromDir}/.env)"
+r4="CONTAINER=eX${toName}"
+sed "s/$f1/$r1/; s/$f2/$r2/; s/$f3/$r3/; s/$f4/$r4/"  ${fromDir}/.env > ${toDir}/.env
+echo ' - copy docker-compose files, change name of service'
+sed "s/xQlibScaffoldService/${toName}Service/" ${fromDir}/docker-compose.yml > ${toDir}/docker-compose.yml
+cp -vn ${fromDir}/no-docker-compose.override.yml ${toDir}/
+echo '------------------------------------------'
+echo '   XQUERY LIBRARY BOILERPLATE CODE   ' 
+echo '------------------------------------------'
+echo ' - create boilerplate xQuery Library module'
+cat <<EOF > ${toDir}/content/${toName}.xqm
+xquery version "3.1";
+module namespace ${toName}  = "http://${nsDomain}/#${toName}";
+(:~
+: The <b>${toName}</b> library provides functions ...
+:)
+
+(:~
+show what ${toName} lib can do in example
+:)
+declare function ${toName}:example(\$name) as xs:string*{
+(( 'Hi', \$name )) => string-join(' ')
+};
+EOF
+echo ' - create boilerplate xQuery unit-test module'
+source .env
+cat <<EOF > ${toDir}/unit-tests/t-${toName}.xqm
+xquery version '3.1';
+(:~
+This module contains XQSuite tests for library
+http://${nsDomain}/#${toName}
+:)
+module namespace t-${toName} = "http://${nsDomain}/#t-${toName}";
+import module namespace ${toName} = "http://${nsDomain}/#${toName}";
+import module namespace test = "http://exist-db.org/xquery/xqsuite"
+  at "resource:org/exist/xquery/lib/xqsuite/xqsuite.xql";
+
+(:~
+${toName}:example
+@given arg 'Grant' as xs:string
+@when function example function is called
+@then 'Hi Grant' is the correct response
+:)
+declare
+%test:name(
+"
+should say 'Hi Grant"
+)
+%test:args('Grant')
+%test:assertEquals('Hi Grant')
+function t-${toName}:example(\$arg){
+\$arg => ${toName}:example()
+};
+EOF
+echo ' - copy .github files'
+cp -vnr ${fromDir}/.github ${toDir}
+
+# TODO!
+# https://gist.github.com/PurpleBooth/109311bb0361f32d87a2
+# WIP!
+echo ' - copy README'
+cat <<EOF > ${toDir}/README.md
+# ${toName} xQuery Library module
+
+One Paragraph of project description goes here
+
+<!--
+[![Build Status](https://travis-ci.org/${gitUser}/${toName}.svg?branch=master)](https://travis-ci.org/grantmacken/oAuth1)
+[![GitHub release](https://img.shields.io/github/release/${gitUser}/${toName}/all.svg)](https://gitHub.com/${gitUser}/${toName}/releases/latest)
+-->
+
+# Using This Library
+
+# Example
+
+# Deployment
+
+
+TODO!
+
+## Built With
+
+* [eXistdb docker image]() - xQuery engine and database
+
+## Versioning
+
+We use [SemVer](http://semver.org/) for versioning. 
+
+[latest release on this repo](https://github.com/${gitUser}/${toName}/releases/latest
+
+<!--
+[![GitHub tag](https://img.shields.io/github/tag/${gitUser}/${toName}.svg)](https://gitHub.com/${gitUser}/${toName}/tags/)
+-->
+
+<!--
+## Contributing
+
+Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426).
+-->
+
+# TESTS
+
+cast of running tests
+
+Link to travis build
+
+EOF
+echo 
+echo ' ... finished '

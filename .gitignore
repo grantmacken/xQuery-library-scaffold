@@ -1,0 +1,5 @@
+build/
+deploy/
+docker-compose.override.yml
+tmp/
+notes/temp.md
