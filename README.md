@@ -22,7 +22,7 @@ In eXistdb, the library type is declared in [repo.xml](https://exist-db.org/exis
 </meta>
 ```
 A 'xQuery Library project' is different from an xQuery application, 
-which are usually public facing web application. 
+which are usually public facing web applications. 
 Such application are out of scope for this project
 
 Our 'xQuery Library project' scope is limited to 2 source code files
@@ -30,16 +30,14 @@ Our 'xQuery Library project' scope is limited to 2 source code files
 - the main xQuery module.
 - unit-test module to test the main xQuery module functions
 
-## What does it generate 
+## What Does It Generate 
 
-This project populates your github xQuery library project with the source code files
+This project populates your own library project with ...
  1. starter boilerplate xQuery lib files ( content/*xqm, unit-tests/t-*.xqm )
  2. easy to tinker with XAR essentials ( inc/repo.mk, inc/expath-pkg.mk )
-
-This project provides for your project a simple *build and test* scaffolding.
-
- - for local building ( `make` ) and unit testing ( `make test` )
- - for travis-ci,  when you commit and push
+ 3. a simple *build and test* scaffolding 
+ 4. travis-ci => github release-asset strategy based on tagged commits
+ 6. and if required a production deployment strategy, based on github webhook notification.
 
 # Set up Steps
 
