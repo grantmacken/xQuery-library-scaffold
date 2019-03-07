@@ -106,6 +106,13 @@ push-release:
 	@git tag v$(shell grep -oP 'version="\K((\d+\.){2}\d+)' build/expath-pkg.xml)
 	@git push origin  v$(shell grep -oP 'version="\K((\d+\.){2}\d+)' build/expath-pkg.xml)
 
+## MISC
+
+.PHONY: log
+log:
+	@echo '##[ $@ ]##'
+	@docker logs -f --since 1m $(CONTAINER)
+
 # enable travis to run tests for this project
 .PHONY: travis-enable
 travis-enable:
