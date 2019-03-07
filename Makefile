@@ -133,40 +133,43 @@ gitLog:
   -n 10\
  --pretty=format:'%Cred%h%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
 
+
+## TESTING SCAFFOLD
+# SMOKE
+# COVERAGE
+
 .PHONY: smoke
 smoke: 
 	@echo '##[ $@ ]##'
-	@bin/xQcall 'oAuth1:example()' \
+	@bin/xQcall 'xQlibScaffold:example()' \
  | grep -oP '^\s-\s(\w|-)(.+)$$'
-	@bin/xQcall 'oAuth1:example()' \
+	@bin/xQcall 'xQlibScaffold:example()' \
  | grep -oP '^OAuth(.+)$$'
 
 .PHONY: coverage
-coverage: 
+coverage:
 	@echo '##[ $@ ]##'
-	@$(MAKE) down --silent
-	@$(MAKE) up --silent
-	@$(MAKE) --silent
-	@bin/xQcall 'system:enable-tracing(true())'
-	@bin/xQcall 'oAuth1:example()' &>/dev/null
-	@bin/xQcall 'system:enable-tracing(false())'
+	@bin/xQcall 'system:clear-trace()'  &>/dev/null
+	@bin/xQcall 'system:enable-tracing(true())'  &>/dev/null
+	@bin/xQcall 'xQlibScaffold:example()' &>/dev/null
+	@bin/xQcall 'system:enable-tracing(false())' &>/dev/null
 	@bin/xQtrace
 
 .PHONY: rec-test
 rec-test:
-	asciinema rec tmp/oAuth1.cast \
+	asciinema rec tmp/xQlibScaffold.cast \
  --overwrite \
- --title='grantmacken/oAuth1 run `make test && make smoke && make coverage`  '\
+ --title='grantmacken/xQlibScaffold run `make test && make smoke && make coverage`  '\
  --command='make test --silent && make smoke --silent && make coverage --silent '
 
 .PHONY: rec-smoke
 rec-smoke:
-	asciinema rec tmp/oAuth1.cast --overwrite --title='grantmacken/oAuth1 run `make smoke`  ' --command='make smoke --silent'
+	asciinema rec tmp/xQlibScaffold.cast --overwrite --title='grantmacken/xQlibScaffold run `make smoke`  ' --command='make smoke --silent'
 
 PHONY: play
 play:
-	asciinema play tmp/oAuth1.cast
+	asciinema play tmp/xQlibScaffold.cast
 
 .PHONY: upload
 upload:
-	asciinema upload tmp/oAuth1.cast
+	asciinema upload tmp/xQlibScaffold.cast
