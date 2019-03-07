@@ -2,7 +2,7 @@
 toDir="$1"
 toName="$(basename ${toDir})"
 fromDir="$(pwd)"
-fromName="$(basename ${fromDir})"
+fromName='xQlibScaffold'
 # domain under my control - replace with your own domain if you wish
 nsDomain="$(grep -oP '^NS_DOMAIN=\K(.+)$' ${fromDir}/.env)"
 gitUser="$( git config user.name )"
@@ -82,10 +82,7 @@ ${toName}:example
 @then 'Hi Grant' is the correct response
 :)
 declare
-%test:name(
-"
-should say 'Hi Grant"
-)
+%test:name("should say 'Hi Grant")
 %test:args('Grant')
 %test:assertEquals('Hi Grant')
 function t-${toName}:example(\$arg){
