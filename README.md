@@ -41,9 +41,11 @@ This project populates your own library project with ...
 
 # Set up Steps
 
+
 ```
 git clone git@github.com:grantmacken/xQlibScaffold.git
 cd xQlibScaffold
+# init with a path project-name 
 ./init ../newXqueryLibName
 ```
 newXqueryLibName will now be populated with starter files
