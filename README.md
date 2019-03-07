@@ -30,6 +30,13 @@ Our 'xQuery Library project' scope is limited to 2 source code files
 - the main xQuery module.
 - unit-test module to test the main xQuery module functions
 
+
+
+
+
+
+
+
 ## What Does It Generate 
 
 This project populates your own library project with ...
@@ -41,14 +48,13 @@ This project populates your own library project with ...
 
 # Set up Steps
 
-
 ```
 git clone git@github.com:grantmacken/xQlibScaffold.git
 cd xQlibScaffold
 # init with a path project-name 
 ./init ../newXqueryLibName
 ```
-newXqueryLibName will now be populated with starter files
+create a newXqueryLibName folder and populates folder with starter files
 and the build and test scaffolding
 
 ```
@@ -58,7 +64,9 @@ and the build and test scaffolding
 │   └── <- files and dir populated from ./init
 ```
 
-We new to make this new project, a git controlled project that can push commits 
+## Bring Project Under Git Control
+
+To make this new project, a git controlled project that can push commits 
 to a github repo ...
 
  - [create a new repo on github](https://help.github.com/en/articles/creating-a-new-repository) 
@@ -78,6 +86,28 @@ git push origin master
 ```
 
 --------------------------------------------------
+
+# Code, Build, Test and Repeat
+
+Use a text editor in split window mode, 
+with the left window, your xQuery module and the
+the right window your unit-test module
+The bottom full screen widow will be your editors terminal
+
+
+TODO: screenshot
+
+
+## Bring Up fresh eXist instance.
+
+```
+make up
+```
+
+[![asciicast](https://asciinema.org/a/232367.svg)](https://asciinema.org/a/232367)
+
+
+
 
 
 
