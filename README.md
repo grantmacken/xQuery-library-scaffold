@@ -152,16 +152,32 @@ Unit test are written using [xQsuite](http://exist-db.org/exist/apps/doc/xqsuite
 
 The xQsuite XML output is transformed into an easy to read TAP formated 'ok, not ok' report.
 
-
 ## Code => Build => Test => Smoke
 
 ```
 make smoke
 ```
 
+[![asciicast](https://asciinema.org/a/232385.svg)](https://asciinema.org/a/232385)
 
+I use a simple build verification test 
+which simply run the 'example' function and
+greps the result to see if required output achieved.
 
+## Code => Build => Test => Coverage
 
+[![asciicast](https://asciinema.org/a/232389.svg)](https://asciinema.org/a/232389)
+
+The most probably does not justify being called a coverage test.
+It counts how many times each function was called when running the example function.
+
+```
+	@bin/xQcall 'system:clear-trace()'  &>/dev/null
+	@bin/xQcall 'system:enable-tracing(true())'  &>/dev/null
+	@bin/xQcall 'csv:example()' &>/dev/null
+	@bin/xQcall 'system:enable-tracing(false())' &>/dev/null
+	@bin/xQtrace
+```
 
 
 
