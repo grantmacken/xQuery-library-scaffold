@@ -94,13 +94,15 @@ with the left window, your xQuery module and the
 the right window your unit-test module
 The bottom full screen widow will be your editors terminal
 
-
-TODO: screenshot
-
+[![asciicast](https://asciinema.org/a/232418.svg)](https://asciinema.org/a/232418)
 
 ## Bring Up Fresh eXist Instance Running In A Docker Container
 
 You only have to do this once for an editing session.
+
+Note: We get a fresh-of-the-shelf eXist container every time we call make up.
+
+Note: TODO  if already running exist ....
 
 ```
 make up
@@ -108,7 +110,7 @@ make up
 
 [![asciicast](https://asciinema.org/a/232367.svg)](https://asciinema.org/a/232367)
 
-As seen in the cast `make up` will can load any dependencies your lib requires.
+As seen in the cast `make up` can load the dependencies your lib requires.
 
 The startup script looks for a pkgs.xar file and will try to install the xars
 
@@ -126,20 +128,31 @@ The startup script looks for a pkgs.xar file and will try to install the xars
 ]
 ```
 
-## Code => Build => Every Time A Coconut
-
-After a coding and saving file to disk you can run `make`.
-
-[![asciicast](https://asciinema.org/a/232374.svg)](https://asciinema.org/a/232374)
-
-A new deployed *version* happens every time we invoke `make`
+##  BUILD PHASE
 
  - [x] the module is copied into running eXist container
  - [x] an eXist compile module check is performed
  - [x] the module version is bumped, and the XAR archive created
  - [x] the XAR is installed an deployed into container
 
-## Code => Build => Test => Unit Tests
+### Code => Compile-Check => Bump => Build => Deploy
+
+`make`
+
+[![asciicast](https://asciinema.org/a/232374.svg)](https://asciinema.org/a/232374)
+
+Note: A new deployed *version* happens every time we invoke `make`
+
+
+
+## TEST PHASE
+
+ 1. Unit-Tests
+ 2. Simple Smoke Test
+ 3. Very Simple Coverage Test
+ 4. Why have you not done this guide
+
+### Code => Build => Test => Unit Tests
 
 ```
 make test
@@ -154,7 +167,7 @@ The xQsuite XML output is transformed into an easy to read TAP formated 'ok, not
 
 Note: the compile test for the unit-test module is run before the tests are ran
 
-## Code => Build => Test => Smoke [ Show Don't Tell ]
+### Code => Build => Test => Smoke [ Show Don't Tell ]
 
 ```
 make smoke
@@ -171,7 +184,7 @@ We want the example function to showcase what the library can do.
 You should be able to quickly  *glance* at the example output,
 and see if more coding work needs to be done.
 
-## Code => Build => Test => Very Very Simple Coverage
+### Code => Build => Test => Very Very Simple Coverage
 
 ```
 make coverage
@@ -179,22 +192,15 @@ make coverage
 
 [![asciicast](https://asciinema.org/a/232389.svg)](https://asciinema.org/a/232389)
 
-The most probably does not justify being called a coverage test.
-It lists each function ans counts how many times the function was called when running the example function. So really it checks if your showcase example function is utilising most of the functions is your library. 
+This probably does not justify being called a coverage test.
+It lists each function and counts how many times the function was called when running a eXist  system trace when calling the example function. So really it checks if the showcase example function is utilising most of the functions is the library. 
 
-```
-	@bin/xQcall 'system:clear-trace()'  &>/dev/null
-	@bin/xQcall 'system:enable-tracing(true())'  &>/dev/null
-	@bin/xQcall 'csv:example()' &>/dev/null
-	@bin/xQcall 'system:enable-tracing(false())' &>/dev/null
-	@bin/xQtrace
-```
-
-## Code => Build => Test => Guide 
+### Code => Build => Test => Guide 
 
 ```
 make guide
 ```
+
 [![asciicast](https://asciinema.org/a/232402.svg)](https://asciinema.org/a/232402)
 
 This is pretty much a Work In Progess
@@ -205,7 +211,7 @@ and uses some schematron rules to check things like
 
 Its pretty limited. 
 
-Note: Its just a guide, there is not fail - pass
+Note: Its just a guide, there is no fail - pass
 
 
  
