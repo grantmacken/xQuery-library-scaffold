@@ -98,13 +98,48 @@ The bottom full screen widow will be your editors terminal
 TODO: screenshot
 
 
-## Bring Up fresh eXist instance.
+## Bring Up Fresh eXist Instance Running In A Docker Container
+
+You only have to do this once for an editing session.
 
 ```
 make up
 ```
 
 [![asciicast](https://asciinema.org/a/232367.svg)](https://asciinema.org/a/232367)
+
+As seen in the cast `make up` will can load any dependencies your lib requires.
+
+The startup script looks for a pkgs.xar file and will try to install the xars
+
+- the package name
+- the package version
+- the xar download URL
+
+```
+[
+  [
+    "http://github.com/Schematron/schematron-exist",
+    "1.1",
+    "https://github.com/Schematron/schematron-exist/raw/master/dist/schematron-exist-1.1.xar"
+  ]
+]
+```
+
+## Every Time A Coconut
+
+After a coding and saving file to disk you can run `make`.
+
+[![asciicast](https://asciinema.org/a/232374.svg)](https://asciinema.org/a/232374)
+
+A new deployed *version* happens every time we invoke `make`
+
+ - the module is copied into running eXist container
+ - [x] an eXist compile module check is performed
+ - the module version is bumped, and the XAR archive created
+ - the XAR is installed an deployed into container
+  
+
 
 
 

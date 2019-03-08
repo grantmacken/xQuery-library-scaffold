@@ -59,7 +59,5 @@ catch * {
 </query>
 EOF
 
-# repo:list() => string-join(\$nl),
-
 
 

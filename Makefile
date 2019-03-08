@@ -133,10 +133,10 @@ gitLog:
   -n 10\
  --pretty=format:'%Cred%h%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
 
-
 ## TESTING SCAFFOLD
 # SMOKE
-# COVERAGE
+# FUNCTION COVERAGE
+# STYLE GUIDE
 
 .PHONY: smoke
 smoke: 
@@ -154,6 +154,14 @@ coverage:
 	@bin/xQcall 'xQlibScaffold:example()' &>/dev/null
 	@bin/xQcall 'system:enable-tracing(false())' &>/dev/null
 	@bin/xQtrace
+
+.PHONY: guide
+guide: 
+	@echo '##[ $@ ]##'
+	@bin/xQguide
+
+
+## screenshots
 
 .PHONY: rec-test
 rec-test:
