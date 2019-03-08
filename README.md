@@ -126,7 +126,7 @@ The startup script looks for a pkgs.xar file and will try to install the xars
 ]
 ```
 
-## Every Time A Coconut
+## Code => Build => Every Time A Coconut
 
 After a coding and saving file to disk you can run `make`.
 
@@ -134,11 +134,33 @@ After a coding and saving file to disk you can run `make`.
 
 A new deployed *version* happens every time we invoke `make`
 
- - the module is copied into running eXist container
+ - [x] the module is copied into running eXist container
  - [x] an eXist compile module check is performed
- - the module version is bumped, and the XAR archive created
- - the XAR is installed an deployed into container
-  
+ - [x] the module version is bumped, and the XAR archive created
+ - [x] the XAR is installed an deployed into container
+
+## Code => Build => Test => Unit Tests
+
+```
+make test
+```
+
+[![asciicast](https://asciinema.org/a/232381.svg)](https://asciinema.org/a/232381)
+
+Unit test are written using [xQsuite](http://exist-db.org/exist/apps/doc/xqsuite.xml)
+ annotation-based Test Framework
+
+The xQsuite XML output is transformed into an easy to read TAP formated 'ok, not ok' report.
+
+
+## Code => Build => Test => Smoke
+
+```
+make smoke
+```
+
+
+
 
 
 
