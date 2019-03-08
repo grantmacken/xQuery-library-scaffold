@@ -152,7 +152,9 @@ Unit test are written using [xQsuite](http://exist-db.org/exist/apps/doc/xqsuite
 
 The xQsuite XML output is transformed into an easy to read TAP formated 'ok, not ok' report.
 
-## Code => Build => Test => Smoke
+Note: the compile test for the unit-test module is run before the tests are ran
+
+## Code => Build => Test => Smoke [ Show Don't Tell ]
 
 ```
 make smoke
@@ -161,15 +163,24 @@ make smoke
 [![asciicast](https://asciinema.org/a/232385.svg)](https://asciinema.org/a/232385)
 
 I use a simple build verification test 
-which simply run the 'example' function and
-greps the result to see if required output achieved.
+which simply runs the 'example' function and
+reg ex greps the result to see if required output is achieved.
 
-## Code => Build => Test => Coverage
+Note: 
+We want the example function to showcase what the library can do.
+You should be able to quickly  *glance* at the example output,
+and see if more coding work needs to be done.
+
+## Code => Build => Test => Very Very Simple Coverage
+
+```
+make coverage
+```
 
 [![asciicast](https://asciinema.org/a/232389.svg)](https://asciinema.org/a/232389)
 
 The most probably does not justify being called a coverage test.
-It counts how many times each function was called when running the example function.
+It lists each function ans counts how many times the function was called when running the example function. So really it checks if your showcase example function is utilising most of the functions is your library. 
 
 ```
 	@bin/xQcall 'system:clear-trace()'  &>/dev/null
@@ -179,6 +190,25 @@ It counts how many times each function was called when running the example funct
 	@bin/xQtrace
 ```
 
+## Code => Build => Test => Guide 
+
+```
+make guide
+```
+[![asciicast](https://asciinema.org/a/232402.svg)](https://asciinema.org/a/232402)
+
+This is pretty much a Work In Progess
+It gets the XML output from inspecting the module via `inspect:inspect-module-uri()`
+and uses some schematron rules to check things like 
+- whether we have used xQdoc annotations for our module and functions
+- whether we are being lazy, and just using 'as item()' when something more specific can be used.
+
+Its pretty limited. 
+
+Note: Its just a guide, there is not fail - pass
+
+
+ 
 
 
 
