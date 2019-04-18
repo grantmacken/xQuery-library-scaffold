@@ -30,13 +30,6 @@ Our 'xQuery Library project' scope is limited to 2 source code files
 - the main xQuery module.
 - unit-test module to test the main xQuery module functions
 
-
-
-
-
-
-
-
 ## What Does It Generate 
 
 This project populates your own library project with ...
@@ -133,15 +126,25 @@ The startup script looks for a pkgs.xar file and will try to install the xars
  - [x] the module is copied into running eXist container
  - [x] an eXist compile module check is performed
  - [x] the module version is bumped, and the XAR archive created
- - [x] the XAR is installed an deployed into container
+ - [x] the XAR is installed and deployed into container
 
-### Code => Compile-Check => Bump => Build => Deploy
+### Code => Compile-Check => Build => Deploy
 
 `make`
 
 [![asciicast](https://asciinema.org/a/232374.svg)](https://asciinema.org/a/232374)
 
-Note: A new deployed *version* happens every time we invoke `make`
+Notes:
+
+1. The first time you run make there will be a noticeable lag. 
+ This is because eXist is prepping the db indexes. The 2nd time
+ you run make you will notice a vast improvement.
+2. A new deployed XAR *version* is deployed every time we invoke `make`
+ This versioning is just a token placeholder while you a developing your library.
+ If you bring your development session down `make down` then bring it up with
+ `make up` the versioning will start back at 'v0.0.1'. An actual release version 
+  will be based on *git commit tags` ...more on this later
+
 
 
 

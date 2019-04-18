@@ -19,7 +19,7 @@ if [ ! -d $toDir ] ; then
 fi
 echo "FROM ${fromName}"
 echo "TO ${toName}"
-mkdir -pv $toDir/{bin,inc,content,unit-tests,tmp}
+mkdir -pv $toDir/{bin,inc,content,unit-tests/fixtures,tmp}
 echo ' - copy bin files'
 cp -vn ${fromDir}/bin/* $toDir/bin
 echo ' - copy Makefile and make includes'
@@ -27,15 +27,14 @@ sed "s/${fromName}/${toName}/g" ${fromDir}/Makefile > $toDir/Makefile
 cp -vn ${fromDir}/inc/* $toDir/inc/
 echo ' - copy travis file'
 cp -vn ${fromDir}/.travis.yml $toDir/
-echo ' - copy .env file and replace vars'
-echo ' - gitignore'
+echo ' - copy gitignore'
+cp -vn ${fromDir}/.gitignore $toDir/
+echo ' - copy  VERSION'
 cp -vn ${fromDir}/.gitignore $toDir/
 echo ' - copy .env file and replace vars'
 # TODO check if port is in use
 f1="$(grep -oP '^NAME(.+)$' ${fromDir}/.env )"
 r1="NAME=${toName}"
-f2="$(grep -oP '^VERSION(.+)$' ${fromDir}/.env )"
-r2='VERSION=v0.0.1'
 f3="$(grep -oP '^TITLE(.+)$' ${fromDir}/.env)"
 r3="TITLE='${toName} xQuery library'"
 f4="$(grep -oP '^CONTAINER(.+)$' ${fromDir}/.env)"

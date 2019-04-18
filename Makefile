@@ -1,11 +1,30 @@
 SHELL=/bin/bash
+
+ifeq ("","$(wildcard ./VERSION)")
+    $(shell touch VERSION && echo 'v0.0.0' > VERSION)
+endif
+
+LAST_TAG_COMMIT = $(shell git rev-list --tags --max-count=1)
+LAST_TAG = $(shell git describe --tags $(LAST_TAG_COMMIT) )
+TAG_PREFIX = "v"
+
+VERSION != grep -oP '^v\K(.+)$$' VERSION
 include .env
+
 git_user != git config user.name
 nsname=http://$(NS_DOMAIN)/\#$(NAME)
 title != echo $(TITLE)
 include inc/repo.mk inc/expath-pkg.mk
-.PHONY: all
-all: build
+
+.PHONY: default
+default: clean compile-main build
+
+build: deploy/$(NAME).xar
+	@echo '##[ $@ ]##'
+	@bin/xQdeploy $<
+	@bin/semVer $(VERSION) patch > VERSION
+	@#touch unit-tests/t-$(NAME).xqm
+	@echo -n 'INFO: prepped for next build: ' && cat VERSION
 
 .PHONY: test
 test: compile-test
@@ -13,14 +32,15 @@ test: compile-test
 
 .PHONY: clean
 clean:
-	@rm -rfv tmp
-	@rm -rfv build
-	@rm -rfv deploy
+	@rm -rfv tmp &>/dev/null
+	@rm -rfv build &>/dev/null
+	@rm -rfv deploy &>/dev/null
 
 .PHONY: up
-up: 
+up: | clean
 	@echo -e '##[ $@ ]##'
 	@bin/exStartUp
+	@touch VERSION && echo 'v0.0.1' > VERSION
 
 .PHONY: down
 down:
@@ -68,52 +88,32 @@ deploy/$(NAME).xar: \
 	@mkdir -p $(dir $@)
 	@cd build && zip $(abspath $@) -r .
 
-.PHONY: build
-build: compile-main deploy/$(NAME).xar
-	@echo '##[ $@ ]##'
-	@bin/xQdeploy deploy/$(NAME).xar
-	@bin/semVer patch
-	@touch unit-tests/t-$(NAME).xqm
-
-.PHONY: reset
-reset:
-	@echo '##[ $@ ]##'
-	@git describe --abbrev=0 --tag
-	@# git describe --tags $(git rev-list --tags --max-count=1)
-	@echo 'revert .env VERSION to current tag' 
-	@source .env; sed -i "s/^VERSION=$${VERSION}/VERSION=$(shell git describe --abbrev=0 --tag )/" .env
-
 .PHONY: prep-release
 prep-release:
 	@echo '##[ $@ ]##'
-	@echo -n "current latest tag: " 
-	@git describe --abbrev=0 --tag
-	@# git describe --tags $(git rev-list --tags --max-count=1)
-	@echo 'revert .env VERSION to current tag' 
-	@sed -i "s/$(shell grep  -oP '^VERSION=(.+)' .env)/VERSION=$(shell git describe --abbrev=0 --tag )/" .env
-	@echo -n ' - bump the version: ' 
-	@bin/semVer patch
-	@grep -oP '^VERSION=\K(.+)$$' .env
+	@#echo ' - working VERSION: $(VERSION) ' 
+	@echo ' -        last tag: $(LAST_TAG)' 
+	@if [ -z '$(LAST_TAG)' ] ; \
+ then echo 'v0.0.0' > VERSION ; \
+ else echo '$(LAST_TAG)' > VERSION ; fi 
+	@bin/semVer $(VERSION) patch > VERSION
+	@echo -n ' -  bumped VERSION: ' 
+	@cat VERSION
 	@echo ' - do a build from the current tag' 
-	@$(MAKE) clean --silent
-	@$(MAKE) --silent
-	@grep -oP '^VERSION=v\K(.+)$$' .env
+	@$(MAKE) --silent &>/dev/null
+	@echo -n ' - expath-pkg version: ' 
 	@echo $$(grep -oP 'version="\K((\d+\.){2}\d+)' build/expath-pkg.xml)
-	@echo 'v$(shell grep -oP 'version="\K((\d+\.){2}\d+)' build/expath-pkg.xml)'
+	echo $(shell grep -oP 'version="\K((\d+\.){2}\d+)' build/expath-pkg.xml)
 
-.PHONY: push-release
+.PHONY: release
 push-release:
 	@git tag v$(shell grep -oP 'version="\K((\d+\.){2}\d+)' build/expath-pkg.xml)
 	@git push origin  v$(shell grep -oP 'version="\K((\d+\.){2}\d+)' build/expath-pkg.xml)
 
-## MISC
-
 .PHONY: log
 log:
-	@echo '##[ $@ ]##'
 	@docker logs -f --since 1m $(CONTAINER)
 
-# enable travis to run tests for this project
 .PHONY: travis-enable
 travis-enable:
 	@echo '##[ $@ ]##'
@@ -124,7 +124,6 @@ travis-enable:
 travis-setup-releases:
 	@echo '##[ $@ ]##'
 	@travis setup releases
-	@#travis encrypt TOKEN="$$(<../.myJWT)" --add 
 
 .PHONY: gitLog
 gitLog:
@@ -133,25 +132,18 @@ gitLog:
   -n 10\
  --pretty=format:'%Cred%h%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
 
-## TESTING SCAFFOLD
-# SMOKE
-# FUNCTION COVERAGE
-# STYLE GUIDE
-
 .PHONY: smoke
 smoke: 
 	@echo '##[ $@ ]##'
-	@bin/xQcall 'xQlibScaffold:example()' \
- | grep -oP '^\s-\s(\w|-)(.+)$$'
-	@bin/xQcall 'xQlibScaffold:example()' \
- | grep -oP '^OAuth(.+)$$'
+	@bin/xQcall '$(NAME):example("$(git_user)")' \
+ | grep -oP '^(\w+)$$'
 
 .PHONY: coverage
-coverage:
+coverage: 
 	@echo '##[ $@ ]##'
 	@bin/xQcall 'system:clear-trace()'  &>/dev/null
 	@bin/xQcall 'system:enable-tracing(true())'  &>/dev/null
-	@bin/xQcall 'xQlibScaffold:example()' &>/dev/null
+	@bin/xQcall '$(NAME):example()' &>/dev/null
 	@bin/xQcall 'system:enable-tracing(false())' &>/dev/null
 	@bin/xQtrace
 
@@ -161,23 +153,12 @@ guide:
 	@bin/xQguide
 
 
-## screenshots
+PHONY: init-repo
+init-repo:
+	@git init
+	@git add .
+	@git commit -m "first commit"
+	@git remote add origin git@github.com:$(git_user)/$(NAME).git
+	@git push origin master
 
-.PHONY: rec-test
-rec-test:
-	asciinema rec tmp/xQlibScaffold.cast \
- --overwrite \
- --title='grantmacken/xQlibScaffold run `make test && make smoke && make coverage`  '\
- --command='make test --silent && make smoke --silent && make coverage --silent '
 
-.PHONY: rec-smoke
-rec-smoke:
-	asciinema rec tmp/xQlibScaffold.cast --overwrite --title='grantmacken/xQlibScaffold run `make smoke`  ' --command='make smoke --silent'
-
-PHONY: play
-play:
-	asciinema play tmp/xQlibScaffold.cast
-
-.PHONY: upload
-upload:
-	asciinema upload tmp/xQlibScaffold.cast
